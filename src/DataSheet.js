@@ -1,4 +1,3 @@
-import '@babel/polyfill'
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import clipboard from 'clipboard-polyfill'

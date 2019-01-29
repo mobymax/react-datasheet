@@ -65,7 +65,6 @@
     "prop-types": "^15.5.9"
   },
   "dependencies": {
-    "@babel/polyfill": "^7.2.5",
     "clipboard-polyfill": "^2.5.4"
   },
   "files": [
