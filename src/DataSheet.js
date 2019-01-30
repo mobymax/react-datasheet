@@ -72,6 +72,15 @@ export default class DataSheet extends PureComponent {
     // Add listener scoped to the DataSheet that catches otherwise unhandled
     // keyboard events when displaying components
     this.dgDom && this.dgDom.addEventListener('keydown', this.handleComponentKey)
+
+    // Do we have a custom start edit cell
+    if (this.props.forceStartEditCell) {
+      this._setState({
+        editing: { i: this.props.forceStartEditCell.i, j: this.props.forceStartEditCell.j },
+        forceEdit: true,
+        start: { i: this.props.forceStartEditCell.i, j: this.props.forceStartEditCell.j }
+      })
+    }
   }
 
   componentWillUnmount () {
@@ -370,7 +379,13 @@ export default class DataSheet extends PureComponent {
       let newLocation = {i: start.i + offsets.i, j: start.j + offsets.j}
       const updateLocation = () => {
         if (data[newLocation.i] && typeof (data[newLocation.i][newLocation.j]) !== 'undefined') {
-          this._setState({start: newLocation, end: newLocation, editing: {}})
+          // do we need to enable editing mode when pressing tab
+          if (this.props.enableTabEdit) {
+            this._setState({start: newLocation, end: newLocation, editing: newLocation})
+          // if no editing mode on tab then just select the cell
+          } else {
+            this._setState({start: newLocation, end: newLocation, editing: {}})
+          }
           e.preventDefault()
           return true
         }
@@ -380,7 +395,13 @@ export default class DataSheet extends PureComponent {
         if (offsets.j < 0) {
           newLocation = {i: start.i - 1, j: data[0].length - 1}
         } else {
-          newLocation = {i: start.i + 1, j: 0}
+          // when jumpRow is enabled and we need to ignore first column then jump to next cell
+          if (this.props.ignoreFirstColumnTab) {
+            newLocation = {i: start.i + 1, j: 1}
+          // when jumpRow is enabled then jump to first column
+          } else {
+            newLocation = {i: start.i + 1, j: 0}
+          }
         }
         updateLocation()
       }
@@ -573,7 +594,10 @@ DataSheet.propTypes = {
   dataEditor: PropTypes.func,
   parsePaste: PropTypes.func,
   attributesRenderer: PropTypes.func,
-  keyFn: PropTypes.func
+  keyFn: PropTypes.func,
+  forceStartEditCell: PropTypes.object,
+  enableTabEdit: PropTypes.bool,
+  ignoreFirstColumnTab: PropTypes.bool
 }
 
 DataSheet.defaultProps = {
@@ -581,5 +605,8 @@ DataSheet.defaultProps = {
   rowRenderer: Row,
   cellRenderer: Cell,
   valueViewer: ValueViewer,
-  dataEditor: DataEditor
+  dataEditor: DataEditor,
+  forceStartEditCell: null,
+  enableTabEdit: false,
+  ignoreFirstColumnTab: false
 }

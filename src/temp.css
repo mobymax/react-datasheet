@@ -1,0 +1,7 @@
+.data-grid-container .data-grid {
+  width: 990px;
+} 
+
+.data-grid-container .data-grid .cell {
+  padding: 10px;
+}

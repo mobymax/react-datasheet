@@ -57,7 +57,7 @@ export const gridHeader = [
 
 export default class Test extends Component {
   state = {
-    grid: [gridHeader].concat([rowTemplate]),
+    grid: [gridHeader].concat([ [...rowTemplate], [...rowTemplate]]),
     ignoreFirstColumn: true,
   }
   
@@ -95,7 +95,7 @@ export default class Test extends Component {
       } else if (changes[0].col === 0) {
         changes.forEach(({ row, col, value }) => {
           const newCol = col + 1;
-          if (newCol < this.props.templateRow.length) {
+          if (newCol < rowTemplate.length) {
             grid[row][newCol] = { ...grid[row][newCol], value };
           }
         });
@@ -142,7 +142,7 @@ export default class Test extends Component {
       additions.forEach(({ row, col, value }) => {
         // we create new index only at first column
         if (!grid[row]) {
-          grid[row] = [...this.props.templateRow];
+          grid[row] = [...rowTemplate];
           if (this.state.ignoreFirstColumn) {
             grid[row][0] = {
               ...grid[row][0],
@@ -154,7 +154,7 @@ export default class Test extends Component {
         // if first column acts like read only than move all values to the right
         if (isPasteOnFirstColumn) {
           const newCol = col + 1;
-          if (newCol < this.props.templateRow.length) {
+          if (newCol < rowTemplate.length) {
             grid[row][newCol] = { value };
           }
         } else {
@@ -169,8 +169,6 @@ export default class Test extends Component {
   }
   
   render() {
-    
-    
     
     return (
       <div
@@ -189,6 +187,10 @@ export default class Test extends Component {
           // rowRenderer={this.rowRenderer}
           // cellRenderer={this.cellRenderer}
           // dataEditor={DataEditorInput}
+
+          forceStartEditCell={{ i:1 , j:1 }}
+          enableTabEdit={true}
+          ignoreFirstColumnTab={true}
         />
       </div>
     )
