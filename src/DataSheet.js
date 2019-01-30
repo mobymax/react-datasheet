@@ -35,7 +35,7 @@ export default class DataSheet extends PureComponent {
     this.onDoubleClick = this.onDoubleClick.bind(this)
     this.onContextMenu = this.onContextMenu.bind(this)
     this.handleNavigate = this.handleNavigate.bind(this)
-    this.handleKey = this.handleKey.bind(this).bind(this)
+    this.handleKey = this.handleKey.bind(this)
     this.handleCopy = this.handleCopy.bind(this)
     this.handlePaste = this.handlePaste.bind(this)
     this.pageClick = this.pageClick.bind(this)
@@ -64,6 +64,8 @@ export default class DataSheet extends PureComponent {
   removeAllListeners () {
     document.removeEventListener('mousedown', this.pageClick)
     document.removeEventListener('mouseup', this.onMouseUp)
+    document.removeEventListener('copy', this.handleCopy)
+    document.removeEventListener('paste', this.handlePaste)
   }
 
   componentDidMount () {
@@ -134,11 +136,15 @@ export default class DataSheet extends PureComponent {
           return value
         }).join('\t')
       ).join('\n')
-      clipboard.writeText(text)
+      if (this.isIE()) {
+        clipboard.writeText(text)
+      } else {
+        e.clipboardData.setData('text/plain', text)
+      }
     }
   }
 
-  handlePaste (text) {
+  handlePaste (mixed) {
     if (isEmpty(this.state.editing)) {
       let { start, end } = this.getState()
 
@@ -147,7 +153,16 @@ export default class DataSheet extends PureComponent {
 
       const parse = this.props.parsePaste || defaultParsePaste
       const changes = []
-      const pasteData = parse(text)
+
+      let pasteData = [];
+      // chrome event will trigger and have a clipboardData event
+      if (typeof mixed === 'object') {
+        pasteData = parse(mixed.clipboardData.getData('text/plain'));
+      // IE will have the data pasted in handleKey
+      } else {
+        pasteData = parse(mixed);
+      }
+
       // in order of preference
       const { data, onCellsChanged, onPaste, onChange } = this.props
       if (onCellsChanged) {
@@ -258,10 +273,13 @@ export default class DataSheet extends PureComponent {
 
     // Copy paste handlers
     if (ctrlKeyPressed) {
-      if (keyCode === C_KEY) {
-        this.handleCopy(e)
-      } else if (keyCode === V_KEY) {
-        clipboard.readText().then(this.handlePaste)
+      // triggers only for IE, Chrome has events: copy, paste
+      if (this.isIE()) {
+        if (keyCode === C_KEY) {
+          this.handleCopy(e)
+        } else if (keyCode === V_KEY) {
+          clipboard.readText().then(this.handlePaste)
+        }
       }
       return true
     }
@@ -285,6 +303,32 @@ export default class DataSheet extends PureComponent {
         }
       }
     }
+  }
+
+  isIE() {
+    const ua = window.navigator.userAgent;
+
+    const msie = ua.indexOf('MSIE ');
+    if (msie > 0) {
+      // IE 10 or older => return version number
+      return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10);
+    }
+
+    const trident = ua.indexOf('Trident/');
+    if (trident > 0) {
+      // IE 11 => return version number
+      const rv = ua.indexOf('rv:');
+      return parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10);
+    }
+
+    const edge = ua.indexOf('Edge/');
+    if (edge > 0) {
+      // Edge (IE 12+) => return version number
+      return parseInt(ua.substring(edge + 5, ua.indexOf('.', edge)), 10);
+    }
+
+    // other browser
+    return false;
   }
 
   getSelectedCells (data, start, end) {
@@ -392,6 +436,10 @@ export default class DataSheet extends PureComponent {
     document.addEventListener('mouseup', this.onMouseUp)
     // Listen for any outside mouse clicks
     document.addEventListener('mousedown', this.pageClick)
+
+    // Copy paste event handler
+    document.addEventListener('copy', this.handleCopy)
+    document.addEventListener('paste', this.handlePaste)
   }
 
   onMouseOver (i, j) {
