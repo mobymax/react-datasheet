@@ -66,12 +66,14 @@ export default class DataSheet extends PureComponent {
     document.removeEventListener('mouseup', this.onMouseUp)
     document.removeEventListener('copy', this.handleCopy)
     document.removeEventListener('paste', this.handlePaste)
+    document.removeEventListener('keydown', this.handleKey)
   }
 
   componentDidMount () {
     // Add listener scoped to the DataSheet that catches otherwise unhandled
     // keyboard events when displaying components
     this.dgDom && this.dgDom.addEventListener('keydown', this.handleComponentKey)
+    document.addEventListener('keydown', this.handleKey)
 
     // Do we have a custom start edit cell
     if (this.props.forceStartEditCell) {
@@ -525,7 +527,7 @@ export default class DataSheet extends PureComponent {
     const {forceEdit} = this.state
 
     return (
-      <span ref={r => { this.dgDom = r }} tabIndex='0' className='data-grid-container' onKeyDown={this.handleKey}>
+      <span ref={r => { this.dgDom = r }} tabIndex='0' className='data-grid-container'>
         <SheetRenderer data={data} className={['data-grid', className, overflow].filter(a => a).join(' ')}>
           {data.map((row, i) =>
             <RowRenderer key={keyFn ? keyFn(i) : i} row={i} cells={row}>
