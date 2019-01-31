@@ -382,8 +382,14 @@ export default class DataSheet extends PureComponent {
       const updateLocation = () => {
         if (data[newLocation.i] && typeof (data[newLocation.i][newLocation.j]) !== 'undefined') {
           // do we need to enable editing mode when pressing tab
-          if (this.props.enableTabEdit) {
-            this._setState({start: newLocation, end: newLocation, editing: newLocation})
+          const cell = this.props.data[newLocation.i][newLocation.j]
+          if (this.props.enableTabEdit && !cell.readOnly) {
+            // do we need to ignore first column
+            if (this.props.ignoreFirstColumnTab && newLocation.j === 0) {
+              this._setState({start: newLocation, end: newLocation, editing: {}})
+            } else {
+              this._setState({start: newLocation, end: newLocation, editing: newLocation})
+            }
           // if no editing mode on tab then just select the cell
           } else {
             this._setState({start: newLocation, end: newLocation, editing: {}})
