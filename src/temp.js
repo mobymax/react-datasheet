@@ -59,8 +59,58 @@ export default class Test extends Component {
   state = {
     grid: [gridHeader].concat([ [...rowTemplate], [...rowTemplate]]),
     ignoreFirstColumn: true,
+    totalNrOfRows: 10,
   }
   
+  defaultParsePaste = (str) => {
+    const newRows = str.split(/\r\n|\n|\r/).map((row) => row.split('\t'));
+    const totalRowsWithMultipleCols = newRows.filter(el => el.length > 1);
+
+    let cols = gridHeader.length - 1;
+    if (this.state.ignoreFirstColumn) {
+      cols--;
+    }
+  
+    let newData = [];
+    // do we have a single column paste? (ex: pdf)
+    if (totalRowsWithMultipleCols.length === 0) {
+      let col = 0;
+      let row = 0;
+      newRows.map((el, index) => {
+        // row does not exists
+        if (!newData[row]) {
+          newData[row] = Object.assign([]);
+        }
+        
+        newData[row][col] = el;
+        
+        if (col === cols) {
+          col = 0;
+          row++;
+        } else {
+          col++;
+        }
+      });
+    } else {
+      newData = [...newRows];
+    }
+    
+    return newData;
+  }
+  
+  /**
+   * Return number of rows found in grid
+   *
+   * @param array gridData
+   * @return integer
+   */
+  getLastRow = gridData => {
+    if (gridData && gridData.length) {
+      return gridData[gridData.length - 1].row;
+    }
+    return 0;
+  }
+
   /**
    * Sets new state for the table.
    * Called each time a cell value is changed.
@@ -69,44 +119,73 @@ export default class Test extends Component {
    * @param array additions Array of cells that are more than the grid
    * @return null
    */
-  onCellChanged = (changes, additions) => {
+   onCellChanged = (changes, additions) => {
     const totalChanges = changes.length;
-    // fix for bad excel pasting
-    if (totalChanges > 1 && !changes[totalChanges - 1].value) {
-      // remove last element which is redundant
-      changes.pop();
-    }
+    let newAdditions = Object.assign([], additions);
 
     const grid = Object.assign([], this.state.grid);
 
-    // do we need to ignore first column when pasting?
-    if (this.state.ignoreFirstColumn) {
-      // if we have only one change then it means we are manually editing
-      if (totalChanges === 1) {
-        // @TODO change this to only 1 row
-        changes.forEach(({ row, col, value }) => {
-          if (col !== 0) {
-            // updates state grid with new values
-            grid[row][col] = { ...grid[row][col], value };
-          }
-        });
+    // cut everything down if changes are more than totalNrOfRows
+    if (newAdditions && this.getLastRow(newAdditions) > this.state.totalNrOfRows + 1) {
+      // cut off additions
+      newAdditions = newAdditions.filter(cell => cell.row < this.state.totalNrOfRows + 1);
+    }
 
-      // if we are pasting from col 0 move all to the right
-      } else if (changes[0].col === 0) {
-        changes.forEach(({ row, col, value }) => {
-          const newCol = col + 1;
-          if (newCol < rowTemplate.length) {
-            grid[row][newCol] = { ...grid[row][newCol], value };
-          }
-        });
+    // if we have only one change then it means we are manually editing
+    if (totalChanges === 1) {
+      // @TODO change this to only 1 row
+      changes.forEach(({ row, col, value }) => {
+        if (col !== 0) {
+        // updates state grid with new values
+        grid[row][col] = { ...grid[row][col], value };
+        }
+      });
 
-      // paste is not from col 0, we update normally
-      } else {
-        changes.forEach(({ row, col, value }) => {
-          // updates state grid with new values
-          grid[row][col] = { ...grid[row][col], value };
-        });
+    // are we pasting from 0,0 ?
+    } else if (this.state.ignoreFirstColumn && this.props.ignoreFirstRow && changes[0].col === 0 && changes[0].row === 0) {
+      let moveDown = false;
+      // compare value with header[col+1] if different then newRow = row + 1
+      if (changes[0].value !== gridHeader[changes[1].col].value) {
+        moveDown = true;
       }
+      changes.forEach(({ row, col, value }) => {
+        const newCol = col + 1;
+        let newRow = row;
+        if (moveDown) {
+          newRow++;
+        }
+        if (newCol < rowTemplate.length) {
+          grid[newRow][newCol] = { ...grid[newRow][newCol], value };
+        }
+      });
+    // do we need to ignore first column when pasting?
+    // if we are pasting from col 0 move all to the right
+    } else if (this.state.ignoreFirstColumn && changes[0].col === 0) {
+      changes.forEach(({ row, col, value }) => {
+        const newCol = col + 1;
+        if (newCol < rowTemplate.length) {
+          grid[row][newCol] = { ...grid[row][newCol], value };
+        }
+      });
+
+    // do we need to ignore first row when pasting?
+    // if we are pasting from row 0 move all one row down if needed only
+    } else if (this.props.ignoreFirstRow && changes[0].row === 0) {
+      let moveDown = false;
+      // compare value with header[col] if different then newRow = row + 1
+      if (changes[0].value !== gridHeader[changes[0].col].value) {
+        moveDown = true;
+      }
+
+      changes.forEach(({ row, col, value }) => {
+        let newRow = row;
+        if (moveDown) {
+          newRow++;
+        }
+        grid[newRow][col] = { ...grid[newRow][col], value };
+      });
+
+    // paste is not from col 0, we update normally
     } else {
       changes.forEach(({ row, col, value }) => {
         // updates state grid with new values
@@ -115,19 +194,13 @@ export default class Test extends Component {
     }
 
     // did we paste more data than present rows?
-    if (additions && additions.length) {
-      // fix for bad excel pasting
-      if (!additions[additions.length - 1].value) {
-        // remove last element which is redundant
-        additions.pop();
-      }
-
+    if (newAdditions && newAdditions.length) {
       // if we have col 0 then we need to move all to the right
       const BreakException = null;
       let isPasteOnFirstColumn = false;
       if (this.state.ignoreFirstColumn) {
         try {
-          additions.forEach(({ col }) => {
+          newAdditions.forEach(({ col }) => {
             if (col === 0) {
               isPasteOnFirstColumn = true;
               throw BreakException;
@@ -139,7 +212,7 @@ export default class Test extends Component {
       }
 
       // add additional rows
-      additions.forEach(({ row, col, value }) => {
+      newAdditions.forEach(({ row, col, value }) => {
         // we create new index only at first column
         if (!grid[row]) {
           grid[row] = [...rowTemplate];
@@ -151,14 +224,14 @@ export default class Test extends Component {
             };
           }
         }
+        let newCol = col;
         // if first column acts like read only than move all values to the right
         if (isPasteOnFirstColumn) {
-          const newCol = col + 1;
-          if (newCol < rowTemplate.length) {
-            grid[row][newCol] = { value };
-          }
-        } else {
-          grid[row][col] = { value };
+          newCol++;
+        }
+        // we only allow additions that do not go over the columns that we have
+        if (newCol < rowTemplate.length) {
+          grid[row][newCol] = { value };
         }
       });
     }
@@ -189,6 +262,7 @@ export default class Test extends Component {
           // dataEditor={DataEditorInput}
 
           ignoreFirstColumnTab={true}
+          parsePaste={this.defaultParsePaste}
         />
       </div>
     )
