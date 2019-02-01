@@ -1,6 +1,6 @@
 {
   "name": "ovidiu-react-datasheet",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "description": "Excel-like data grid for React",
   "repository": {
     "type": "git",
