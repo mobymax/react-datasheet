@@ -74,7 +74,9 @@ export default class DataSheet extends PureComponent {
     // keyboard events when displaying components
     this.dgDom && this.dgDom.addEventListener('keydown', this.handleComponentKey)
     if (this.isIE()) {
-      document.addEventListener('keydown', this.handleKey)
+      window.requestAnimationFrame(() => {
+        document.addEventListener('keydown', this.handleKey)
+      })
     }
   }
 
