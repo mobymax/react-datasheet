@@ -74,15 +74,6 @@ export default class DataSheet extends PureComponent {
     // keyboard events when displaying components
     this.dgDom && this.dgDom.addEventListener('keydown', this.handleComponentKey)
     document.addEventListener('keydown', this.handleKey)
-
-    // Do we have a custom start edit cell
-    if (this.props.forceStartEditCell) {
-      this._setState({
-        editing: { i: this.props.forceStartEditCell.i, j: this.props.forceStartEditCell.j },
-        forceEdit: true,
-        start: { i: this.props.forceStartEditCell.i, j: this.props.forceStartEditCell.j }
-      })
-    }
   }
 
   componentWillUnmount () {
@@ -381,19 +372,7 @@ export default class DataSheet extends PureComponent {
       let newLocation = {i: start.i + offsets.i, j: start.j + offsets.j}
       const updateLocation = () => {
         if (data[newLocation.i] && typeof (data[newLocation.i][newLocation.j]) !== 'undefined') {
-          // do we need to enable editing mode when pressing tab
-          const cell = this.props.data[newLocation.i][newLocation.j]
-          if (this.props.enableTabEdit && !cell.readOnly) {
-            // do we need to ignore first column
-            if (this.props.ignoreFirstColumnTab && newLocation.j === 0) {
-              this._setState({start: newLocation, end: newLocation, editing: {}})
-            } else {
-              this._setState({start: newLocation, end: newLocation, editing: newLocation})
-            }
-          // if no editing mode on tab then just select the cell
-          } else {
-            this._setState({start: newLocation, end: newLocation, editing: {}})
-          }
+          this._setState({start: newLocation, end: newLocation, editing: {}})
           e.preventDefault()
           return true
         }
@@ -603,8 +582,6 @@ DataSheet.propTypes = {
   parsePaste: PropTypes.func,
   attributesRenderer: PropTypes.func,
   keyFn: PropTypes.func,
-  forceStartEditCell: PropTypes.object,
-  enableTabEdit: PropTypes.bool,
   ignoreFirstColumnTab: PropTypes.bool
 }
 
@@ -614,7 +591,5 @@ DataSheet.defaultProps = {
   cellRenderer: Cell,
   valueViewer: ValueViewer,
   dataEditor: DataEditor,
-  forceStartEditCell: null,
-  enableTabEdit: false,
   ignoreFirstColumnTab: false
 }

@@ -147,7 +147,7 @@ export default class Test extends Component {
             grid[row][0] = {
               ...grid[row][0],
               value: (row).toString(),
-              dataEditor: DataEditorSimulator,
+              // dataEditor: DataEditorSimulator,
             };
           }
         }
@@ -188,8 +188,6 @@ export default class Test extends Component {
           // cellRenderer={this.cellRenderer}
           // dataEditor={DataEditorInput}
 
-          forceStartEditCell={{ i:1 , j:1 }}
-          enableTabEdit={true}
           ignoreFirstColumnTab={true}
         />
       </div>
