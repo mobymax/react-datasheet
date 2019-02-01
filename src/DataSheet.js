@@ -70,10 +70,12 @@ export default class DataSheet extends PureComponent {
   }
 
   componentDidMount () {
-    document.addEventListener('keydown', this.handleKey)
     // Add listener scoped to the DataSheet that catches otherwise unhandled
     // keyboard events when displaying components
     this.dgDom && this.dgDom.addEventListener('keydown', this.handleComponentKey)
+    if (this.isIE()) {
+      document.addEventListener('keydown', this.handleKey)
+    }
   }
 
   componentWillUnmount () {
@@ -510,9 +512,15 @@ export default class DataSheet extends PureComponent {
       dataRenderer, valueRenderer, dataEditor, valueViewer, attributesRenderer,
       className, overflow, data, keyFn} = this.props
     const {forceEdit} = this.state
+    let handler = {}
+    if (!this.isIE()) {
+      handler = {
+        onKeyDown: this.handleKey
+      }
+    }
 
     return (
-      <span ref={r => { this.dgDom = r }} tabIndex='0' className='data-grid-container'>
+      <span ref={r => { this.dgDom = r }} tabIndex='0' className='data-grid-container' { ...handler }>
         <SheetRenderer data={data} className={['data-grid', className, overflow].filter(a => a).join(' ')}>
           {data.map((row, i) =>
             <RowRenderer key={keyFn ? keyFn(i) : i} row={i} cells={row}>
