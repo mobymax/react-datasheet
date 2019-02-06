@@ -1,5 +1,5 @@
 {
-  "name": "react-datasheet",
+  "name": "@moby/react-datasheet",
   "version": "1.0.0",
   "description": "Datasheet adaptation from nadbm/react-datasheet",
   "repository": {
