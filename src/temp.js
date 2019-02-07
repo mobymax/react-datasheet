@@ -55,9 +55,20 @@ export const gridHeader = [
   },
 ];
 
+const getMultipleRows = nr => {
+  const arr = [];
+  let el = {};
+  for (let i = 0; i < nr; i++) {
+    el = JSON.parse(JSON.stringify(rowTemplate));
+    el[0].value = i + 1;
+    arr.push(el);
+  }
+  return arr;
+}
+
 export default class Test extends Component {
   state = {
-    grid: [gridHeader].concat([ [...rowTemplate], [...rowTemplate]]),
+    grid: [gridHeader].concat(getMultipleRows(30)),
     ignoreFirstColumn: true,
     totalNrOfRows: 10,
   }

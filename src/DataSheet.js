@@ -71,13 +71,23 @@ export default class DataSheet extends PureComponent {
   componentDidMount () {
     // Add listener scoped to the DataSheet that catches otherwise unhandled
     // keyboard events when displaying components
-    this.dgDom && this.dgDom.addEventListener('keydown', this.handleComponentKey)
-    this.dgDom && this.dgDom.addEventListener('keydown', this.handleKey)
+    if (this.isIE()) {
+      document.addEventListener('keydown', this.handleComponentKey)
+      document.addEventListener('keydown', this.handleKey)
+    } else {
+      this.dgDom && this.dgDom.addEventListener('keydown', this.handleComponentKey)
+      this.dgDom && this.dgDom.addEventListener('keydown', this.handleKey)
+    }
   }
 
   componentWillUnmount () {
-    this.dgDom && this.dgDom.removeEventListener('keydown', this.handleComponentKey)
-    this.dgDom && this.dgDom.removeEventListener('keydown', this.handleKey)
+    if (this.isIE()) {
+      document.removeEventListener('keydown', this.handleComponentKey)
+      document.removeEventListener('keydown', this.handleKey)
+    } else {
+      this.dgDom && this.dgDom.removeEventListener('keydown', this.handleComponentKey)
+      this.dgDom && this.dgDom.removeEventListener('keydown', this.handleKey)
+    }
     this.removeAllListeners()
   }
 
@@ -517,8 +527,15 @@ export default class DataSheet extends PureComponent {
       className, overflow, data, keyFn} = this.props
     const {forceEdit} = this.state
 
+    let tab = {};
+    if (!this.isIE()) {
+      tab = {
+        tabIndex: 0,
+      }
+    }
+
     return (
-      <span ref={r => { this.dgDom = r }} tabIndex='0' className='data-grid-container'>
+      <span ref={r => { this.dgDom = r }} { ...tab } className='data-grid-container'>
         <SheetRenderer data={data} className={['data-grid', className, overflow].filter(a => a).join(' ')}>
           {data.map((row, i) =>
             <RowRenderer key={keyFn ? keyFn(i) : i} row={i} cells={row}>
