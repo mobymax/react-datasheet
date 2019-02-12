@@ -96,9 +96,12 @@ export default class DataSheet extends PureComponent {
   }
   
   fireAll = (e) => {
-    this.handleComponentKey(e);
     // if (!this.isIE()) {
-      this.handleKey(e);
+    this.handleKey(e, () => {
+      window.requestAnimationFrame(() => {
+        this.handleComponentKey(e);
+      });
+    });
     // }
   }
 
@@ -233,6 +236,7 @@ export default class DataSheet extends PureComponent {
   }
 
   handleKeyboardCellMovement (e, commit = false) {
+    console.info('calling handleKeyboardCellMovement');
     const {start, editing} = this.getState()
     const {data} = this.props
     const isEditing = editing && !isEmpty(editing)
