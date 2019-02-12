@@ -394,6 +394,7 @@ export default class DataSheet extends PureComponent {
       let newLocation = {i: start.i + offsets.i, j: start.j + offsets.j}
 
       const updateLocation = () => {
+        console.info('data', data[newLocation.i], typeof (data[newLocation.i][newLocation.j]));
         if (data[newLocation.i] && typeof (data[newLocation.i][newLocation.j]) !== 'undefined') {
           // when jumpRow is enabled and we use shift + tab
           if (this.props.ignoreFirstColumnTab && newLocation.j === 0) {
