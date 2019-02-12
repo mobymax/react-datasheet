@@ -1,6 +1,6 @@
 {
   "name": "@moby/react-datasheet",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Datasheet adaptation from nadbm/react-datasheet",
   "repository": {
     "type": "git",
