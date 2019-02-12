@@ -97,7 +97,9 @@ export default class DataSheet extends PureComponent {
   
   fireAll = (e) => {
     this.handleComponentKey(e);
-    this.handleKey(e);
+    // if (!this.isIE()) {
+      this.handleKey(e);
+    // }
   }
 
   isSelectionControlled () {
@@ -304,7 +306,7 @@ export default class DataSheet extends PureComponent {
       }
       return true
     }
-
+    console.info('isEditing in handleKey', isEditing);
     if (!isEditing) {
       this.handleKeyboardCellMovement(e)
       if (deleteKeysPressed) {
@@ -429,6 +431,7 @@ export default class DataSheet extends PureComponent {
     const {editing} = this.state
     const {data} = this.props
     const isEditing = !isEmpty(editing)
+    console.info('isEditing in handleComponentKey', isEditing);
     if (isEditing) {
       const currentCell = data[editing.i][editing.j]
       const offset = e.shiftKey ? -1 : 1
