@@ -321,6 +321,7 @@ export default class DataSheet extends PureComponent {
             lettersPressed ||
             latin1Supplement ||
             equationKeysPressed) {
+              console.info('handleKey: setState editing to ', JSON.parse(JSON.stringify(start)))
           // empty out cell if user starts typing without pressing enter
           this._setState({editing: start, clear: start, forceEdit: false})
         }
@@ -398,6 +399,7 @@ export default class DataSheet extends PureComponent {
           if (this.props.ignoreFirstColumnTab && newLocation.j === 0) {
             return false;
           }
+          console.info('handleNavigate: setState editing to {}')
           this._setState({start: newLocation, end: newLocation, editing: {}})
           e.preventDefault()
           return true
