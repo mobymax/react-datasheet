@@ -54,7 +54,8 @@ export default class DataSheet extends PureComponent {
       selecting: false,
       forceEdit: false,
       editing: {},
-      clear: {}
+      clear: {},
+      handleNavigate: false,
     }
     this.state = this.defaultState
 
@@ -72,37 +73,35 @@ export default class DataSheet extends PureComponent {
     // Add listener scoped to the DataSheet that catches otherwise unhandled
     // keyboard events when displaying components
     if (this.isIE()) {
-      // document.addEventListener('keydown', this.handleComponentKey)
-      // document.addEventListener('keydown', this.handleKey)
       document.addEventListener('keydown', this.fireAll)
     } else {
-      // this.dgDom && this.dgDom.addEventListener('keydown', this.handleComponentKey)
-      // this.dgDom && this.dgDom.addEventListener('keydown', this.handleKey)
       this.dgDom && this.dgDom.addEventListener('keydown', this.fireAll)
     }
   }
 
   componentWillUnmount () {
     if (this.isIE()) {
-      // document.removeEventListener('keydown', this.handleComponentKey)
-      // document.removeEventListener('keydown', this.handleKey)
       document.removeEventListener('keydown', this.fireAll)
     } else {
-      // this.dgDom && this.dgDom.removeEventListener('keydown', this.handleComponentKey)
-      // this.dgDom && this.dgDom.removeEventListener('keydown', this.handleKey)
       this.dgDom && this.dgDom.removeEventListener('keydown', this.fireAll)
     }
     this.removeAllListeners()
   }
   
   fireAll = (e) => {
-    // if (!this.isIE()) {
-    this.handleKey(e, () => {
-      window.requestAnimationFrame(() => {
-        this.handleComponentKey(e);
-      });
+    this.handleComponentKey(e);
+
+    if (this.isIE()) {
+      if (!this.state.handleNavigate) {
+        this.handleKey(e);
+      }
+    } else {
+      this.handleKey(e);
+    }
+
+    this.setState({
+      handleNavigate: false,
     });
-    // }
   }
 
   isSelectionControlled () {
@@ -236,7 +235,6 @@ export default class DataSheet extends PureComponent {
   }
 
   handleKeyboardCellMovement (e, commit = false) {
-    console.info('calling handleKeyboardCellMovement');
     const {start, editing} = this.getState()
     const {data} = this.props
     const isEditing = editing && !isEmpty(editing)
@@ -310,7 +308,6 @@ export default class DataSheet extends PureComponent {
       }
       return true
     }
-    console.info('isEditing in handleKey', isEditing);
     if (!isEditing) {
       this.handleKeyboardCellMovement(e)
       if (deleteKeysPressed) {
@@ -325,7 +322,6 @@ export default class DataSheet extends PureComponent {
             lettersPressed ||
             latin1Supplement ||
             equationKeysPressed) {
-              console.info('handleKey: setState editing to ', JSON.parse(JSON.stringify(start)))
           // empty out cell if user starts typing without pressing enter
           this._setState({editing: start, clear: start, forceEdit: false})
         }
@@ -392,19 +388,20 @@ export default class DataSheet extends PureComponent {
   }
 
   handleNavigate (e, offsets, jumpRow) {
+    this.setState({
+      handleNavigate: true,
+    });
     if (offsets && (offsets.i || offsets.j)) {
       const {start} = this.getState()
       const {data} = this.props
       let newLocation = {i: start.i + offsets.i, j: start.j + offsets.j}
 
       const updateLocation = () => {
-        console.info('data', data[newLocation.i], typeof (data[newLocation.i][newLocation.j]));
         if (data[newLocation.i] && typeof (data[newLocation.i][newLocation.j]) !== 'undefined') {
           // when jumpRow is enabled and we use shift + tab
           if (this.props.ignoreFirstColumnTab && newLocation.j === 0) {
             return false;
           }
-          console.info('handleNavigate: setState editing to {}')
           this._setState({start: newLocation, end: newLocation, editing: {}})
           e.preventDefault()
           return true
@@ -429,7 +426,7 @@ export default class DataSheet extends PureComponent {
     }
   }
 
-  handleComponentKey (e) {
+  handleComponentKey (e, f) {
     // handles keyboard events when editing components
     const keyCode = e.which || e.keyCode
     if (![ENTER_KEY, ESCAPE_KEY, TAB_KEY].includes(keyCode)) {
@@ -438,7 +435,6 @@ export default class DataSheet extends PureComponent {
     const {editing} = this.state
     const {data} = this.props
     const isEditing = !isEmpty(editing)
-    console.info('isEditing in handleComponentKey', isEditing);
     if (isEditing) {
       const currentCell = data[editing.i][editing.j]
       const offset = e.shiftKey ? -1 : 1
