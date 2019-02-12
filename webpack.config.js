@@ -1,12 +1,16 @@
 var path = require('path');
 const src = path.resolve('src');
+const demo = path.resolve('demo');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   mode: 'development',
   cache: true,
   devtool: 'eval',
-  entry: ['babel-polyfill', path.join(src, 'app')],
+  entry: [
+    'babel-polyfill',
+    path.join(demo, 'app')
+  ],
   output: {
     path: path.resolve('build'),
     pathinfo: true,
@@ -24,7 +28,7 @@ module.exports = {
     rules: [
       {
         test: /\.js$/,
-        include: src,
+        include: [src, demo],
         use: [
           {
             loader: 'babel-loader',
@@ -34,7 +38,7 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        include: [src],
+        include: [src, demo],
         loader: 'style-loader!css-loader?modules&importLoaders&localIdentName=[name]--[local]',
       }
     ]

@@ -72,23 +72,32 @@ export default class DataSheet extends PureComponent {
     // Add listener scoped to the DataSheet that catches otherwise unhandled
     // keyboard events when displaying components
     if (this.isIE()) {
-      document.addEventListener('keydown', this.handleComponentKey)
-      document.addEventListener('keydown', this.handleKey)
+      // document.addEventListener('keydown', this.handleComponentKey)
+      // document.addEventListener('keydown', this.handleKey)
+      document.addEventListener('keydown', this.fireAll)
     } else {
-      this.dgDom && this.dgDom.addEventListener('keydown', this.handleComponentKey)
-      this.dgDom && this.dgDom.addEventListener('keydown', this.handleKey)
+      // this.dgDom && this.dgDom.addEventListener('keydown', this.handleComponentKey)
+      // this.dgDom && this.dgDom.addEventListener('keydown', this.handleKey)
+      this.dgDom && this.dgDom.addEventListener('keydown', this.fireAll)
     }
   }
 
   componentWillUnmount () {
     if (this.isIE()) {
-      document.removeEventListener('keydown', this.handleComponentKey)
-      document.removeEventListener('keydown', this.handleKey)
+      // document.removeEventListener('keydown', this.handleComponentKey)
+      // document.removeEventListener('keydown', this.handleKey)
+      document.removeEventListener('keydown', this.fireAll)
     } else {
-      this.dgDom && this.dgDom.removeEventListener('keydown', this.handleComponentKey)
-      this.dgDom && this.dgDom.removeEventListener('keydown', this.handleKey)
+      // this.dgDom && this.dgDom.removeEventListener('keydown', this.handleComponentKey)
+      // this.dgDom && this.dgDom.removeEventListener('keydown', this.handleKey)
+      this.dgDom && this.dgDom.removeEventListener('keydown', this.fireAll)
     }
     this.removeAllListeners()
+  }
+  
+  fireAll = (e) => {
+    this.handleComponentKey(e);
+    this.handleKey(e);
   }
 
   isSelectionControlled () {

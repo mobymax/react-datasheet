@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import ReactDataSheet from './index';
+import ReactDataSheet from '../src/index';
 
 export const rowTemplate = [
   { value: '' },
