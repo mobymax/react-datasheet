@@ -54,7 +54,8 @@ export default class DataSheet extends PureComponent {
       selecting: false,
       forceEdit: false,
       editing: {},
-      clear: {}
+      clear: {},
+      handleNavigate: false,
     }
     this.state = this.defaultState
 
@@ -72,23 +73,35 @@ export default class DataSheet extends PureComponent {
     // Add listener scoped to the DataSheet that catches otherwise unhandled
     // keyboard events when displaying components
     if (this.isIE()) {
-      document.addEventListener('keydown', this.handleComponentKey)
-      document.addEventListener('keydown', this.handleKey)
+      document.addEventListener('keydown', this.fireAll)
     } else {
-      this.dgDom && this.dgDom.addEventListener('keydown', this.handleComponentKey)
-      this.dgDom && this.dgDom.addEventListener('keydown', this.handleKey)
+      this.dgDom && this.dgDom.addEventListener('keydown', this.fireAll)
     }
   }
 
   componentWillUnmount () {
     if (this.isIE()) {
-      document.removeEventListener('keydown', this.handleComponentKey)
-      document.removeEventListener('keydown', this.handleKey)
+      document.removeEventListener('keydown', this.fireAll)
     } else {
-      this.dgDom && this.dgDom.removeEventListener('keydown', this.handleComponentKey)
-      this.dgDom && this.dgDom.removeEventListener('keydown', this.handleKey)
+      this.dgDom && this.dgDom.removeEventListener('keydown', this.fireAll)
     }
     this.removeAllListeners()
+  }
+  
+  fireAll = (e) => {
+    this.handleComponentKey(e);
+
+    if (this.isIE()) {
+      if (!this.state.handleNavigate) {
+        this.handleKey(e);
+      }
+    } else {
+      this.handleKey(e);
+    }
+
+    this.setState({
+      handleNavigate: false,
+    });
   }
 
   isSelectionControlled () {
@@ -295,7 +308,6 @@ export default class DataSheet extends PureComponent {
       }
       return true
     }
-
     if (!isEditing) {
       this.handleKeyboardCellMovement(e)
       if (deleteKeysPressed) {
@@ -376,6 +388,9 @@ export default class DataSheet extends PureComponent {
   }
 
   handleNavigate (e, offsets, jumpRow) {
+    this.setState({
+      handleNavigate: true,
+    });
     if (offsets && (offsets.i || offsets.j)) {
       const {start} = this.getState()
       const {data} = this.props
@@ -411,7 +426,7 @@ export default class DataSheet extends PureComponent {
     }
   }
 
-  handleComponentKey (e) {
+  handleComponentKey (e, f) {
     // handles keyboard events when editing components
     const keyCode = e.which || e.keyCode
     if (![ENTER_KEY, ESCAPE_KEY, TAB_KEY].includes(keyCode)) {
