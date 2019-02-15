@@ -119,7 +119,7 @@ export default class DataSheet extends PureComponent {
     return state
   }
 
-  _setState (state) {
+  _setState (state, f, d) {
     if (this.isSelectionControlled() && (('start' in state) || ('end' in state))) {
       let { start, end, ...rest } = state
       let { selected, onSelect } = this.props
@@ -131,9 +131,9 @@ export default class DataSheet extends PureComponent {
         end = 'end' in selected ? selected.end : this.defaultState.end
       }
       onSelect && onSelect({ start, end })
-      this.setState(rest)
+      this.setState(rest, f ? () => f(d) : null)
     } else {
-      this.setState(state)
+      this.setState(state, f ? () => f(d) : null)
     }
   }
 
@@ -402,7 +402,7 @@ export default class DataSheet extends PureComponent {
           if (this.props.ignoreFirstColumnTab && newLocation.j === 0) {
             return false;
           }
-          this._setState({start: newLocation, end: newLocation, editing: {}})
+          this._setState({start: newLocation, end: newLocation, editing: {}}, this.scrollTo, newLocation)
           e.preventDefault()
           return true
         }
@@ -424,6 +424,11 @@ export default class DataSheet extends PureComponent {
         updateLocation()
       }
     }
+  }
+
+  scrollTo = newLocation => {
+    const scrollHeight = this.props.rowHeight * (newLocation.i - 1);
+    window.scrollTo(0, scrollHeight);
   }
 
   handleComponentKey (e, f) {
