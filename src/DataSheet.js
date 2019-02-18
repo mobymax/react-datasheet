@@ -402,7 +402,12 @@ export default class DataSheet extends PureComponent {
           if (this.props.ignoreFirstColumnTab && newLocation.j === 0) {
             return false;
           }
-          this._setState({start: newLocation, end: newLocation, editing: {}}, this.scrollTo, newLocation)
+          let editing = {};
+          // necessary for forcing the keyboard to appear if on a tablet/phone
+          if (this.props.mobile) {
+            editing = newLocation;
+          }
+          this._setState({start: newLocation, end: newLocation, editing}, this.scrollTo, newLocation)
           e.preventDefault()
           return true
         }
@@ -544,7 +549,7 @@ export default class DataSheet extends PureComponent {
   render () {
     const {sheetRenderer: SheetRenderer, rowRenderer: RowRenderer, cellRenderer,
       dataRenderer, valueRenderer, dataEditor, valueViewer, attributesRenderer,
-      className, overflow, data, keyFn} = this.props
+      className, overflow, data, keyFn, mobile} = this.props
     const {forceEdit} = this.state
 
     let tab = {};
@@ -585,6 +590,7 @@ export default class DataSheet extends PureComponent {
                       dataRenderer={dataRenderer}
                       valueViewer={valueViewer}
                       dataEditor={dataEditor}
+                      mobile={mobile}
                     />
                   )
                 })
@@ -625,7 +631,8 @@ DataSheet.propTypes = {
   parsePaste: PropTypes.func,
   attributesRenderer: PropTypes.func,
   keyFn: PropTypes.func,
-  ignoreFirstColumnTab: PropTypes.bool
+  ignoreFirstColumnTab: PropTypes.bool,
+  mobile: PropTypes.bool,
 }
 
 DataSheet.defaultProps = {
@@ -634,5 +641,6 @@ DataSheet.defaultProps = {
   cellRenderer: Cell,
   valueViewer: ValueViewer,
   dataEditor: DataEditor,
-  ignoreFirstColumnTab: false
+  ignoreFirstColumnTab: false,
+  mobile: false,
 }

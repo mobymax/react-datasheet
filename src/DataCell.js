@@ -154,21 +154,21 @@ export default class DataCell extends PureComponent {
     }
   }
 
-  renderViewer (cell, row, col, valueRenderer, valueViewer) {
+  renderViewer (cell, row, col, valueRenderer, valueViewer, mobile, handleMouseDown) {
     const Viewer = cell.valueViewer || valueViewer || ValueViewer
     const value = renderValue(cell, row, col, valueRenderer)
-    return <Viewer cell={cell} row={row} col={col} value={value} />
+    return <Viewer cell={cell} row={row} col={col} value={value} mobile={mobile} onFocus={handleMouseDown} />
   }
 
   render () {
     const {row, col, cell, cellRenderer: CellRenderer,
       valueRenderer, dataEditor, valueViewer, attributesRenderer,
-      selected, editing, onKeyUp} = this.props
+      selected, editing, onKeyUp, mobile} = this.props
     const {updated} = this.state
 
     const content = this.renderComponent(editing, cell) ||
         this.renderEditor(editing, cell, row, col, dataEditor) ||
-        this.renderViewer(cell, row, col, valueRenderer, valueViewer)
+        this.renderViewer(cell, row, col, valueRenderer, valueViewer, mobile, this.handleMouseDown)
 
     const className = [
       cell.className,
@@ -222,7 +222,8 @@ DataCell.propTypes = {
   onDoubleClick: PropTypes.func.isRequired,
   onContextMenu: PropTypes.func.isRequired,
   onChange: PropTypes.func.isRequired,
-  onRevert: PropTypes.func.isRequired
+  onRevert: PropTypes.func.isRequired,
+  mobile: PropTypes.bool,
 }
 
 DataCell.defaultProps = {
@@ -230,5 +231,6 @@ DataCell.defaultProps = {
   selected: false,
   editing: false,
   clearing: false,
-  cellRenderer: Cell
+  cellRenderer: Cell,
+  mobile: false,
 }
