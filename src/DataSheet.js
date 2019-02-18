@@ -317,6 +317,8 @@ export default class DataSheet extends PureComponent {
         if (enterKeyPressed) {
           this._setState({editing: start, clear: {}, forceEdit: true})
           e.preventDefault()
+        } else if(this.props.mobile) {
+          this._setState({editing: start, clear: {}, forceEdit: true})
         } else if (numbersPressed ||
             numPadKeysPressed ||
             lettersPressed ||
