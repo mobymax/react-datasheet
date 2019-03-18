@@ -17,6 +17,13 @@ export default class DataEditor extends PureComponent {
     this.props.onChange(e.target.value)
   }
 
+  handleFocus = () => {
+    if (this.props.value) {
+      // resets the position of cursor to the end of text
+      this._input.selectionStart = this._input.selectionEnd = this.props.value.length; // eslint-disable-line
+    }
+  }
+
   render () {
     const {value, onKeyDown} = this.props
     return (
@@ -26,6 +33,7 @@ export default class DataEditor extends PureComponent {
         value={value}
         onChange={this.handleChange}
         onKeyDown={onKeyDown}
+        onFocus={this.handleFocus}
       />
     )
   }

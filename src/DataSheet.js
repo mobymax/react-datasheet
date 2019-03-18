@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types'
 import * as clipboard from "clipboard-polyfill"
 import Sheet from './Sheet'
@@ -434,8 +435,16 @@ export default class DataSheet extends PureComponent {
   }
 
   scrollTo = newLocation => {
-    const scrollHeight = this.props.rowHeight * (newLocation.i - 1);
-    window.scrollTo(0, scrollHeight);
+    const cell = ReactDOM.findDOMNode(this.currentCell);
+    const windowHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+    const lastPosition = cell.offsetTop + cell.offsetHeight;
+    const currentScrollPos = document.documentElement.scrollTop;
+    if (lastPosition > windowHeight + currentScrollPos) {
+      window.scrollTo(0, lastPosition - windowHeight + cell.offsetHeight - 3);
+    }
+    if (cell.offsetTop < currentScrollPos) {
+      window.scrollTo(0, cell.offsetTop - cell.offsetHeight + 3);
+    }
   }
 
   handleComponentKey (e, f) {
@@ -570,6 +579,7 @@ export default class DataSheet extends PureComponent {
                 row.map((cell, j) => {
                   return (
                     <DataCell
+                      ref={r => { if(this.isSelected(i, j)) { this.currentCell = r; } }}
                       key={cell.key ? cell.key : `${i}-${j}`}
                       row={i}
                       col={j}
