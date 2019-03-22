@@ -437,7 +437,7 @@ export default class DataSheet extends PureComponent {
   scrollTo = newLocation => {
     const cell = ReactDOM.findDOMNode(this.currentCell);
     const windowHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-    const lastPosition = cell.offsetTop + cell.offsetHeight;
+    const lastPosition = cell.offsetTop + cell.offsetHeight + this.dgDom.offsetTop;
     const currentScrollPos = document.documentElement.scrollTop;
     if (lastPosition > windowHeight + currentScrollPos) {
       window.scrollTo(0, lastPosition - windowHeight + cell.offsetHeight - 3);
