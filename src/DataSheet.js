@@ -437,7 +437,7 @@ export default class DataSheet extends PureComponent {
   scrollTo = newLocation => {
     const cell = ReactDOM.findDOMNode(this.currentCell);
     const windowHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-    const lastPosition = cell.offsetTop + cell.offsetHeight + this.dgDom.offsetTop;
+    const lastPosition = cell.offsetTop + cell.offsetHeight + this.dgDom.offsetTop + this.props.offsetBottom;
     const currentScrollPos = document.documentElement.scrollTop;
     if (lastPosition > windowHeight + currentScrollPos) {
       window.scrollTo(0, lastPosition - windowHeight + cell.offsetHeight - 3);
@@ -645,6 +645,7 @@ DataSheet.propTypes = {
   keyFn: PropTypes.func,
   ignoreFirstColumnTab: PropTypes.bool,
   mobile: PropTypes.bool,
+  offsetBottom: PropTypes.number, // in case bottom area is covered by something we don't know of
 }
 
 DataSheet.defaultProps = {
@@ -655,4 +656,5 @@ DataSheet.defaultProps = {
   dataEditor: DataEditor,
   ignoreFirstColumnTab: false,
   mobile: false,
+  offsetBottom: 0,
 }
