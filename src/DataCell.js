@@ -40,8 +40,8 @@ export default class DataCell extends PureComponent {
 
   componentWillReceiveProps (nextProps) {
     if (initialValue(nextProps) !== initialValue(this.props)) {
-      this.setState({updated: true})
-      this.timeout = setTimeout(() => this.setState({updated: false}), 700)
+      // this.setState({updated: true})
+      // this.timeout = setTimeout(() => this.setState({updated: false}), 700)
     }
     if (nextProps.editing === true && this.props.editing === false) {
       const value = nextProps.clearing ? '' : initialData(nextProps)
