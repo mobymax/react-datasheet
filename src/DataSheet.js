@@ -151,6 +151,9 @@ export default class DataSheet extends PureComponent {
       e.preventDefault()
       const {dataRenderer, valueRenderer, data} = this.props
       const {start, end} = this.getState()
+      if (this.props.ignoreFirstColumnCopy && start.j === 0){
+        start.j = 1;
+      }
 
       const text = range(start.i, end.i).map((i) =>
         range(start.j, end.j).map(j => {
@@ -645,6 +648,7 @@ DataSheet.propTypes = {
   attributesRenderer: PropTypes.func,
   keyFn: PropTypes.func,
   ignoreFirstColumnTab: PropTypes.bool,
+  ignoreFirstColumnCopy: PropTypes.bool,
   mobile: PropTypes.bool,
   offsetBottom: PropTypes.number, // in case bottom area is covered by something we don't know of
 }
@@ -656,6 +660,7 @@ DataSheet.defaultProps = {
   valueViewer: ValueViewer,
   dataEditor: DataEditor,
   ignoreFirstColumnTab: false,
+  ignoreFirstColumnCopy: false,
   mobile: false,
   offsetBottom: 0,
 }
