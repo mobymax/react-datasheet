@@ -273,6 +273,7 @@ export default class Test extends Component {
           // dataEditor={DataEditorInput}
 
           ignoreFirstColumnTab={true}
+          ignoreFirstColumnCopy={true}
           parsePaste={this.defaultParsePaste}
         />
       </div>
