@@ -68,6 +68,7 @@ export default class DataSheet extends PureComponent {
     document.removeEventListener('mouseup', this.onMouseUp)
     document.removeEventListener('copy', this.handleCopy)
     document.removeEventListener('paste', this.handlePaste)
+    document.removeEventListener('keydown', this.fireAll)
   }
 
   componentDidMount () {
