@@ -57,6 +57,7 @@ export default class DataSheet extends PureComponent {
       editing: {},
       clear: {},
       handleNavigate: false,
+      events: false,
     }
     this.state = this.defaultState
 
@@ -69,16 +70,13 @@ export default class DataSheet extends PureComponent {
     document.removeEventListener('copy', this.handleCopy)
     document.removeEventListener('paste', this.handlePaste)
     document.removeEventListener('keydown', this.fireAll)
+    this.setState({
+      events: false,
+    })
   }
 
   componentDidMount () {
-    // Add listener scoped to the DataSheet that catches otherwise unhandled
-    // keyboard events when displaying components
-    if (this.isIE()) {
-      document.addEventListener('keydown', this.fireAll)
-    } else {
-      this.dgDom && this.dgDom.addEventListener('keydown', this.fireAll)
-    }
+    this.attachEventListeners();
   }
 
   componentWillUnmount () {
@@ -89,7 +87,26 @@ export default class DataSheet extends PureComponent {
     }
     this.removeAllListeners()
   }
-  
+
+  componentWillReceiveProps = nextProps => {
+    if (nextProps.reattachEvents && this.state.events === false) {
+      this.attachEventListeners()
+    }
+  }
+
+  attachEventListeners = () => {
+    // Add listener scoped to the DataSheet that catches otherwise unhandled
+    // keyboard events when displaying components
+    if (this.isIE()) {
+      document.addEventListener('keydown', this.fireAll)
+    } else {
+      this.dgDom && this.dgDom.addEventListener('keydown', this.fireAll)
+    }
+    this.setState({
+      events: true,
+    })
+  }
+
   fireAll = (e) => {
     this.handleComponentKey(e);
 
@@ -652,6 +669,7 @@ DataSheet.propTypes = {
   ignoreFirstColumnCopy: PropTypes.bool,
   mobile: PropTypes.bool,
   offsetBottom: PropTypes.number, // in case bottom area is covered by something we don't know of
+  reattachEvents: PropTypes.bool,
 }
 
 DataSheet.defaultProps = {
@@ -664,4 +682,5 @@ DataSheet.defaultProps = {
   ignoreFirstColumnCopy: false,
   mobile: false,
   offsetBottom: 0,
+  reattachEvents: false,
 }

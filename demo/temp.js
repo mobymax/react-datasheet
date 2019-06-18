@@ -274,6 +274,7 @@ export default class Test extends Component {
 
           ignoreFirstColumnTab={true}
           ignoreFirstColumnCopy={true}
+          reattachEvents={true}
           parsePaste={this.defaultParsePaste}
         />
       </div>
