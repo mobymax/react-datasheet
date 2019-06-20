@@ -57,7 +57,6 @@ export default class DataSheet extends PureComponent {
       editing: {},
       clear: {},
       handleNavigate: false,
-      events: false,
     }
     this.state = this.defaultState
 
@@ -69,10 +68,6 @@ export default class DataSheet extends PureComponent {
     document.removeEventListener('mouseup', this.onMouseUp)
     document.removeEventListener('copy', this.handleCopy)
     document.removeEventListener('paste', this.handlePaste)
-    document.removeEventListener('keydown', this.fireAll)
-    this.setState({
-      events: false,
-    })
   }
 
   componentDidMount () {
@@ -89,7 +84,9 @@ export default class DataSheet extends PureComponent {
   }
 
   componentWillReceiveProps = nextProps => {
-    if (nextProps.reattachEvents && this.state.events === false) {
+    if (nextProps.removeEvents) {
+      document.removeEventListener('keydown', this.fireAll)
+    } else {
       this.attachEventListeners()
     }
   }
@@ -102,9 +99,6 @@ export default class DataSheet extends PureComponent {
     } else {
       this.dgDom && this.dgDom.addEventListener('keydown', this.fireAll)
     }
-    this.setState({
-      events: true,
-    })
   }
 
   fireAll = (e) => {
@@ -669,7 +663,7 @@ DataSheet.propTypes = {
   ignoreFirstColumnCopy: PropTypes.bool,
   mobile: PropTypes.bool,
   offsetBottom: PropTypes.number, // in case bottom area is covered by something we don't know of
-  reattachEvents: PropTypes.bool,
+  removeEvents: PropTypes.bool,
 }
 
 DataSheet.defaultProps = {
@@ -682,5 +676,5 @@ DataSheet.defaultProps = {
   ignoreFirstColumnCopy: false,
   mobile: false,
   offsetBottom: 0,
-  reattachEvents: false,
+  removeEvents: false,
 }
