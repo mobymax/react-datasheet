@@ -426,9 +426,12 @@ export default class DataSheet extends PureComponent {
           if (this.props.mobile) {
             editing = newLocation;
           }
-          this._setState({start: newLocation, end: newLocation, editing}, this.scrollTo, newLocation)
-          e.preventDefault()
-          return true
+          //prevent going up from the first row as this would result in scrolling to the end of the table.
+          if(newLocation.i !== 0){
+            this._setState({start: newLocation, end: newLocation, editing}, this.scrollTo, newLocation)
+            e.preventDefault()
+            return true
+          }
         }
         return false
       }
