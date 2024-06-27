@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import { PureComponent } from 'react';
 import PropTypes from 'prop-types'
 
 import {ENTER_KEY, ESCAPE_KEY, TAB_KEY, RIGHT_KEY, LEFT_KEY, UP_KEY, DOWN_KEY} from './keys'
@@ -38,7 +38,7 @@ export default class DataCell extends PureComponent {
     this.state = {updated: false, reverting: false, value: '', committing: false}
   }
 
-  componentWillReceiveProps (nextProps) {
+  UNSAFE_componentWillReceiveProps (nextProps) {
     if (initialValue(nextProps) !== initialValue(this.props)) {
       // this.setState({updated: true})
       // this.timeout = setTimeout(() => this.setState({updated: false}), 700)

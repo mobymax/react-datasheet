@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import { PureComponent } from 'react'
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types'
 import * as clipboard from "clipboard-polyfill"
@@ -83,7 +83,7 @@ export default class DataSheet extends PureComponent {
     this.removeAllListeners()
   }
 
-  componentWillReceiveProps = nextProps => {
+  UNSAFE_componentWillReceiveProps = nextProps => {
     if (nextProps.removeEvents) {
       document.removeEventListener('keydown', this.fireAll)
     } else {

@@ -8,4 +8,4 @@ lib
 npm-debug.log
 node_modules
 .nyc_output
-.package-lock.json
+package-lock.json
