@@ -2,13 +2,14 @@ var path = require('path');
 const src = path.resolve('src');
 const demo = path.resolve('demo');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   mode: 'development',
   cache: true,
   devtool: 'eval',
   entry: [
-    'babel-polyfill',
+    '@babel/polyfill',
     path.join(demo, 'app')
   ],
   output: {
@@ -32,14 +33,25 @@ module.exports = {
         use: [
           {
             loader: 'babel-loader',
-            query: require('./babel.dev'), // eslint-disable-line
+            options: require('./babel.dev'), // eslint-disable-line
           },
         ],
       },
       {
         test: /\.css$/,
         include: [src, demo],
-        loader: 'style-loader!css-loader?modules&importLoaders&localIdentName=[name]--[local]',
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              importLoaders: 1,
+              modules: {
+                localIdentName: '[name]--[local]',
+              },
+            },
+          },
+        ]
       }
     ]
   },
@@ -48,8 +60,14 @@ module.exports = {
       inject: true,
       template: path.resolve('index.html'),
     }),
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: 'src/react-datasheet.css', to: 'static/css/' },
+        { from: 'demo/temp.css', to: 'static/css/' },
+      ],
+    }),
   ],
   devServer: {
-    disableHostCheck: true,
+    allowedHosts: 'all',
   }
 };
