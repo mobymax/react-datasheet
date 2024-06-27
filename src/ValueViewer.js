@@ -1,26 +1,28 @@
-import { PureComponent } from 'react'
-import PropTypes from 'prop-types'
+import { PureComponent } from 'react';
+import PropTypes from 'prop-types';
 
-import CellShape from './CellShape'
+import CellShape from './CellShape';
 
 export default class ValueViewer extends PureComponent {
-  render () {
-    const {value, cell, row, col, mobile, onFocus} = this.props;
-    if(mobile && !(cell.readOnly || cell.isReadOnly)) {
+  render() {
+    const {
+      value, cell, row, col, mobile, onFocus,
+    } = this.props;
+    if (mobile && !(cell.readOnly || cell.isReadOnly)) {
       return (
         <input
           value={value}
-          className='value-viewer'
+          className="value-viewer"
           onFocus={e => onFocus(e, row, col)}
           onChange={() => {}} // to make React happy
         />
       );
     }
     return (
-      <span className='value-viewer'>
+      <span className="value-viewer">
         {value}
       </span>
-    )
+    );
   }
 }
 
@@ -31,9 +33,9 @@ ValueViewer.propTypes = {
   value: PropTypes.node.isRequired,
   mobile: PropTypes.bool,
   onFocus: PropTypes.func,
-}
+};
 
 ValueViewer.defaultProps = {
   mobile: false,
   onFocus: () => {},
-}
+};
