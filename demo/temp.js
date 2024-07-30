@@ -1,5 +1,4 @@
-import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
+import { Component } from 'react';
 import ReactDataSheet from '../src/index';
 
 export const rowTemplate = [
