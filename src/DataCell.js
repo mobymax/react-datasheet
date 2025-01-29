@@ -157,7 +157,7 @@ export default class DataCell extends PureComponent {
   renderViewer (cell, row, col, valueRenderer, valueViewer, mobile, handleMouseDown) {
     const Viewer = cell.valueViewer || valueViewer || ValueViewer
     const value = renderValue(cell, row, col, valueRenderer)
-    return <Viewer cell={cell} row={row} col={col} value={value} mobile={mobile} onFocus={handleMouseDown} />
+    return <Viewer cell={cell} row={row} col={col} value={value} mobile={mobile} onFocus={handleMouseDown} header={this.props.header} />
   }
 
   render () {
@@ -224,6 +224,7 @@ DataCell.propTypes = {
   onChange: PropTypes.func.isRequired,
   onRevert: PropTypes.func.isRequired,
   mobile: PropTypes.bool,
+  header: PropTypes.array,
 }
 
 DataCell.defaultProps = {
@@ -233,4 +234,5 @@ DataCell.defaultProps = {
   clearing: false,
   cellRenderer: Cell,
   mobile: false,
+  header: [],
 }
