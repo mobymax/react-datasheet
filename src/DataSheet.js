@@ -143,7 +143,7 @@ export default class DataSheet extends PureComponent {
       if (!end) {
         end = 'end' in selected ? selected.end : this.defaultState.end
       }
-      onSelect && onSelect({ start, end })
+      onSelect && onSelect({ start, end, editing: state.editing })
       this.setState(rest, f ? () => f(d) : null)
     } else {
       this.setState(state, f ? () => f(d) : null)
@@ -551,7 +551,7 @@ export default class DataSheet extends PureComponent {
     let { start, end } = this.state
     let prevEnd = prevState.end
     if (!isEmpty(end) && !(end.i === prevEnd.i && end.j === prevEnd.j) && !this.isSelectionControlled()) {
-      this.props.onSelect && this.props.onSelect({ start, end })
+      this.props.onSelect && this.props.onSelect({ start, end, editing: this.state.editing })
     }
   }
 
@@ -622,6 +622,7 @@ export default class DataSheet extends PureComponent {
                       valueViewer={valueViewer}
                       dataEditor={dataEditor}
                       mobile={mobile}
+                      header={this.props.header}
                     />
                   )
                 })
@@ -667,6 +668,7 @@ DataSheet.propTypes = {
   mobile: PropTypes.bool,
   offsetBottom: PropTypes.number, // in case bottom area is covered by something we don't know of
   removeEvents: PropTypes.bool,
+  header: PropTypes.array,
 }
 
 DataSheet.defaultProps = {
@@ -680,4 +682,5 @@ DataSheet.defaultProps = {
   mobile: false,
   offsetBottom: 0,
   removeEvents: false,
+  header: [],
 }
