@@ -191,10 +191,10 @@ export default class DataSheet extends PureComponent {
 
       start = { i: Math.min(start.i, end.i), j: Math.min(start.j, end.j) }
       end = { i: Math.max(start.i, end.i), j: Math.max(start.j, end.j) }
+      const noCellsSelected = !start || isEmpty(start)
+      const currentCell = !noCellsSelected && this.props.data[start.i][start.j]
 
-      const cellHeaderConfig = this.props.header && this.props.header[start.j];
-      // check if it is disabled column
-      if (cellHeaderConfig && cellHeaderConfig.isDisabled) {
+      if (currentCell && currentCell.readOnly) {
         return true;
       }
 
@@ -333,29 +333,27 @@ export default class DataSheet extends PureComponent {
     }
 
     if (!isEditing) {
-      const cellHeaderConfig = this.props.header && this.props.header[start.j];
-      // check if it is disabled column
-      if (cellHeaderConfig && cellHeaderConfig.isDisabled) {
+      console.log('currentCell', currentCell.readOnly);
+      this.handleKeyboardCellMovement(e)
+      if (currentCell.readOnly) {
         return true;
       }
-      this.handleKeyboardCellMovement(e)
       if (deleteKeysPressed) {
         e.preventDefault()
         this.clearSelectedCells(start, end)
-      } else if (currentCell && !currentCell.readOnly) {
-        if (enterKeyPressed) {
-          this._setState({editing: start, clear: {}, forceEdit: true})
-          e.preventDefault()
-        } else if(this.props.mobile) {
-          this._setState({editing: start, clear: {}, forceEdit: true})
-        } else if (numbersPressed ||
-            numPadKeysPressed ||
-            lettersPressed ||
-            latin1Supplement ||
-            equationKeysPressed) {
-          // empty out cell if user starts typing without pressing enter
-          this._setState({editing: start, clear: start, forceEdit: false})
-        }
+      }
+      if (enterKeyPressed) {
+        this._setState({editing: start, clear: {}, forceEdit: true})
+        e.preventDefault()
+      } else if(this.props.mobile) {
+        this._setState({editing: start, clear: {}, forceEdit: true})
+      } else if (numbersPressed ||
+          numPadKeysPressed ||
+          lettersPressed ||
+          latin1Supplement ||
+          equationKeysPressed) {
+        // empty out cell if user starts typing without pressing enter
+        this._setState({editing: start, clear: start, forceEdit: false})
       }
     }
   }
@@ -679,7 +677,6 @@ DataSheet.propTypes = {
   mobile: PropTypes.bool,
   offsetBottom: PropTypes.number, // in case bottom area is covered by something we don't know of
   removeEvents: PropTypes.bool,
-  header: PropTypes.array,
 }
 
 DataSheet.defaultProps = {
@@ -693,5 +690,4 @@ DataSheet.defaultProps = {
   mobile: false,
   offsetBottom: 0,
   removeEvents: false,
-  header: [],
 }
