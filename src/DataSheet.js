@@ -340,8 +340,7 @@ export default class DataSheet extends PureComponent {
       if (deleteKeysPressed) {
         e.preventDefault()
         this.clearSelectedCells(start, end)
-      }
-      if (enterKeyPressed) {
+      } else if(enterKeyPressed) {
         this._setState({editing: start, clear: {}, forceEdit: true})
         e.preventDefault()
       } else if(this.props.mobile) {
