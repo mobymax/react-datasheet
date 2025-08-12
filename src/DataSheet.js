@@ -192,6 +192,12 @@ export default class DataSheet extends PureComponent {
       start = { i: Math.min(start.i, end.i), j: Math.min(start.j, end.j) }
       end = { i: Math.max(start.i, end.i), j: Math.max(start.j, end.j) }
 
+      const cellHeaderConfig = this.props.header && this.props.header[start.j];
+      // check if it is disabled column
+      if (cellHeaderConfig && cellHeaderConfig.isDisabled) {
+        return true;
+      }
+
       const parse = this.props.parsePaste || defaultParsePaste
       const changes = []
 
@@ -325,7 +331,13 @@ export default class DataSheet extends PureComponent {
       }
       return true
     }
+
     if (!isEditing) {
+      const cellHeaderConfig = this.props.header && this.props.header[start.j];
+      // check if it is disabled column
+      if (cellHeaderConfig && cellHeaderConfig.isDisabled) {
+        return true;
+      }
       this.handleKeyboardCellMovement(e)
       if (deleteKeysPressed) {
         e.preventDefault()
@@ -667,6 +679,7 @@ DataSheet.propTypes = {
   mobile: PropTypes.bool,
   offsetBottom: PropTypes.number, // in case bottom area is covered by something we don't know of
   removeEvents: PropTypes.bool,
+  header: PropTypes.array,
 }
 
 DataSheet.defaultProps = {
@@ -680,4 +693,5 @@ DataSheet.defaultProps = {
   mobile: false,
   offsetBottom: 0,
   removeEvents: false,
+  header: [],
 }
