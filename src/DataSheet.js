@@ -333,7 +333,6 @@ export default class DataSheet extends PureComponent {
     }
 
     if (!isEditing) {
-      console.log('currentCell', currentCell.readOnly);
       this.handleKeyboardCellMovement(e)
       if (currentCell.readOnly) {
         return true;
